@@ -20,6 +20,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import br.edu.ifpr.demo.domain.Driver;
 import br.edu.ifpr.demo.domain.DriverRepository;
+import br.edu.ifpr.demo.exception.ApiException;
+import jakarta.validation.Validator;
 
 @Service
 @RestController
@@ -28,6 +30,9 @@ public class DriverController {
 
     @Autowired
     DriverRepository driverRepository;
+
+    @Autowired
+    Validator validator;
 
     @GetMapping("/drivers")
     public List<Driver> listDrivers() {
@@ -43,13 +48,32 @@ public class DriverController {
 
     @PostMapping("/drivers")
     public Driver createDriver(@RequestBody Driver driver) {
+        var violations = validator.validate(driver);
+        if (!violations.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            for (jakarta.validation.ConstraintViolation<Driver> violation : violations) {
+                sb.append(violation.getPropertyPath()).append(": ").append(violation.getMessage()).append("; ");
+            }
+            throw new ApiException(sb.toString(), HttpStatus.BAD_REQUEST);
+        }
         return driverRepository.save(driver);
     }
 
     //altera o objeto inteiro
     @PutMapping("/drivers/{id}")
     public Driver fullUpdateDriver(@PathVariable("id") Long id, @RequestBody Driver driver) {
+        var violations =  validator.validate(driver);
+        if (!violations.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            for (jakarta.validation.ConstraintViolation<Driver> violation : violations) {
+                sb.append(violation.getPropertyPath()).append(": ").append(violation.getMessage()).append("; ");
+            }
+            throw new ApiException(sb.toString(), HttpStatus.BAD_REQUEST);
+        }
+        
         Driver foundDriver = findDriver(id);
+
+
         foundDriver.setName(driver.getName());
         foundDriver.setBirthDate(driver.getBirthDate());
         return driverRepository.save(foundDriver);
