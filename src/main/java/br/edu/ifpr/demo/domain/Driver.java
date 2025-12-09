@@ -23,7 +23,6 @@ public class Driver {
 
     @NotBlank(message = "Nome é obrigatório")
     @Size(min = 3, max = 50, message = "Nome deve ter entre 3 e 50 caracteres")
-    @Pattern(regexp = "^[^\\s]{3,50}$", message = "Nome não pode conter espaços em branco")
     String name;
 
     @NotBlank(message = "Email é obrigatório")

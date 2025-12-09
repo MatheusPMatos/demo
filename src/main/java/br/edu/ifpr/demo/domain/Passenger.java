@@ -13,6 +13,15 @@ public class Passenger {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
+    
     @Nonnull
     String name;
+
+    public Passenger() {
+    }
+
+    public Passenger(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 }
